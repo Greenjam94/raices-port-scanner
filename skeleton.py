@@ -32,7 +32,7 @@ def scan(host):
             print(f"{GRAY}[*] {host}:{port} CLOSED {RESET}", end="\r")
 
 def run_step_one():
-    # get host from the user
+    """ get host from the user """
     host = input("Enter host: ")
     scan(host)
 
@@ -52,6 +52,8 @@ def read_file(file):
     return host_port_tuples
 
 def scan_tuples(tuples):
+    """ Take a list of host and port combos and process if port is open.
+    Writes output to a file """
     f = open("open_port.txt", "a")
 
     # iterate over tuples
@@ -63,13 +65,13 @@ def scan_tuples(tuples):
     print("Wrote to open_port.txt")
 
 def run_step_two():
-    # get filename to read host/port values from
-    file = input("enter filename containing host port values")
+    """ get filename to read host/port values from """
+    file = input("Enter filename containing host port values: ")
     tuples = read_file(file)
     scan_tuples(tuples)
 
 NUM_THREADS = 200
-# ToDo: Performance tuning via thread counts
+#Bonus ToDo: Performance tuning via thread counts
 '''
 The built-in queue module allows you to exchange data safely between
 multiple threads. The Queue class in the queue module implements all 
@@ -80,6 +82,7 @@ q = Queue()
 print_lock = Lock()
 
 def scan_host_port(host, port):
+    """ Print open ports for provided host and port """
     if port_open(host, port):
         with print_lock:
             print(f"{GREEN}[*] {host}:{port} OPEN {RESET}")
@@ -92,13 +95,14 @@ def scan_thread():
         q.task_done()
 
 def setup_threads():
+    """ Start threads """
     for t in range(NUM_THREADS):
         t = Thread(target=scan_thread)
         t.daemon = True
         t.start()
 
 def run_step_three():
-    # ask user for host:port file and process with Threads
+    """ ask user for host:port file and process with Threads """
     setup_threads()
 
     filename = input("Enter filename containing host port values: ")
@@ -110,33 +114,39 @@ def run_step_three():
     # wait for all tasks before ending
     q.join()
 
-def main():
+def main(step=1):
     ascii_banner = pyfiglet.figlet_format("PORT SCANNER")
     print(ascii_banner)
     print("-" * 50)
+    print(f"Running step {step}")
 
     '''
     STEP 1
     '''
-    # run_step_one()
+    if step == 1:
+        run_step_one()
 
 
     '''
     STEP 2
     '''
-    # run_step_two()
+    if step == 2:
+        run_step_two()
 
     '''
     STEP 3
     '''
-    run_step_three()
+    if step == 3:
+        run_step_three()
+
+    #BonusToDo: Find the service running on an open port
 
     print("-" * 50)
 
 
 if __name__ == '__main__':
     try:
-        main()
+        main(int(input("Which step to run? 1,2,3: "))) # Replace parameter with 1,2,3 to rerun selected step
     except KeyboardInterrupt:
         print("\n Exiting Program!")
         sys.exit()
