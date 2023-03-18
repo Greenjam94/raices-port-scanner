@@ -36,9 +36,37 @@ def run_step_one():
     host = input("Enter host: ")
     scan(host)
 
+def read_file(file):
+    """ Read in a file, parse line by line, return a tuple of host and port combos"""
+    f = open(file, "r")
+    lines = f.readlines()
+    host_port_tuples = []
+
+    for line in lines:
+        line = line.strip()
+        line = line.split(":")
+        host = line[0]
+        port = int(line[1])
+        host_port_tuples.append([host, port])
+    
+    return host_port_tuples
+
+def scan_tuples(tuples):
+    f = open("open_port.txt", "a")
+
+    # iterate over tuples
+    for host,port in tuples:
+        if port_open(host, port):
+            f.write(f"{host}:{port}"+"\n")
+    
+    f.close()
+    print("Wrote to open_port.txt")
+
 def run_step_two():
     # get filename to read host/port values from
-    return None
+    file = input("enter filename containing host port values")
+    tuples = read_file(file)
+    scan_tuples(tuples)
 
 NUM_THREADS = 200
 '''
@@ -62,13 +90,13 @@ def main():
     '''
     STEP 1
     '''
-    run_step_one()
+    # run_step_one()
 
 
     '''
     STEP 2
     '''
-    # run_step_two()
+    run_step_two()
 
     '''
     STEP 3
