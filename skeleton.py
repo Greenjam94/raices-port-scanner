@@ -11,11 +11,34 @@ GREEN = Fore.GREEN
 RESET = Fore.RESET
 GRAY = Fore.LIGHTBLACK_EX
 
+def port_open(host, port):
+    """ Return true if connect succeeds. Else return False """
+    s = socket.socket()
+
+    try:
+        s.connect([host, port])
+        #ToDo: timout optimization
+    except:
+        return False
+    return True
+
+def scan(host):
+    """ Iterate through prots 1-65535 """
+    for port in range(1, 65535):
+        if port_open(host, port):
+            #Cool tip: reset output
+            print(f"{GREEN}[*] {host}:{port} OPEN {RESET}")
+        else:
+            print(f"{GRAY}[*] {host}:{port} CLOSED {RESET}", end="\r")
+
 def run_step_one():
     # get host from the user
+    host = input("Enter host: ")
+    scan(host)
 
 def run_step_two():
     # get filename to read host/port values from
+    return None
 
 NUM_THREADS = 200
 '''
@@ -29,6 +52,7 @@ print_lock = Lock()
 
 def run_step_three():
     # ask user for host:port file and process with Threads
+    return None
 
 def main():
     ascii_banner = pyfiglet.figlet_format("PORT SCANNER")
@@ -38,7 +62,7 @@ def main():
     '''
     STEP 1
     '''
-    # run_step_one()
+    run_step_one()
 
 
     '''
