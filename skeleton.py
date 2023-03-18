@@ -69,6 +69,7 @@ def run_step_two():
     scan_tuples(tuples)
 
 NUM_THREADS = 200
+# ToDo: Performance tuning via thread counts
 '''
 The built-in queue module allows you to exchange data safely between
 multiple threads. The Queue class in the queue module implements all 
@@ -78,9 +79,36 @@ q = Queue()
 # print while using Threads
 print_lock = Lock()
 
+def scan_host_port(host, port):
+    if port_open(host, port):
+        with print_lock:
+            print(f"{GREEN}[*] {host}:{port} OPEN {RESET}")
+
+def scan_thread():
+    """ Define how a single thread consumes from Queue """
+    while True:
+        worker = q.get()
+        scan_host_port(worker[0], worker[1])
+        q.task_done()
+
+def setup_threads():
+    for t in range(NUM_THREADS):
+        t = Thread(target=scan_thread)
+        t.daemon = True
+        t.start()
+
 def run_step_three():
     # ask user for host:port file and process with Threads
-    return None
+    setup_threads()
+
+    filename = input("Enter filename containing host port values: ")
+    tuples = read_file(filename)
+
+    for host_port in tuples:
+        q.put(host_port)
+    
+    # wait for all tasks before ending
+    q.join()
 
 def main():
     ascii_banner = pyfiglet.figlet_format("PORT SCANNER")
@@ -96,12 +124,12 @@ def main():
     '''
     STEP 2
     '''
-    run_step_two()
+    # run_step_two()
 
     '''
     STEP 3
     '''
-    # run_step_three()
+    run_step_three()
 
     print("-" * 50)
 
